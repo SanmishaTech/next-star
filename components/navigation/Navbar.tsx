@@ -43,22 +43,19 @@ interface NavbarProps {
 }
 
 export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }: NavbarProps) {
-  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set([0, 1, 2, 3])); // All groups expanded by default
+  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set([0, 1, 2])); // All groups expanded by default
   const router = useRouter();
   const pathname = usePathname();
 
+  // Dashboard item - standalone outside groups
+  const dashboardItem: NavItem = {
+    icon: <Home className="h-4 w-4" />,
+    label: 'Dashboard',
+    href: '/dashboard',
+    enabled: true,
+  };
+
   const menuGroups: NavGroup[] = [
-    {
-      title: "Main",
-      items: [
-        {
-          icon: <Home className="h-4 w-4" />,
-          label: 'Dashboard',
-          href: '/dashboard',
-          enabled: true,
-        },
-      ].filter(item => item.enabled)
-    },
     {
       title: "Customers",
       items: [
@@ -87,14 +84,20 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
       items: [        
         {
           icon: <Table className="h-4 w-4" />,
-          label: 'Simple Tables',
-          href: '/simple-tables',
+          label: 'Table',
+          href: '/table',
           enabled: true,
         },
         {
           icon: <FormInput className="h-4 w-4" />,
-          label: 'Sample Form',
-          href: '/forms',
+          label: 'Form',
+          href: '/form',
+          enabled: true,
+        },
+        {
+          icon: <Building className="h-4 w-4" />,
+          label: 'Elements',
+          href: '/elements',
           enabled: true,
         },        
       ].filter(item => item.enabled)
@@ -206,7 +209,7 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
   return (
     <div className={`fixed inset-y-0 left-0 z-50 ${sidebarWidth} bg-card border-r transform ${
       sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-    } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}>
+    } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col h-screen`}>
       
       {/* Logo */}
       <div className={`flex items-center justify-between ${headerHeight} ${padding} border-b flex-shrink-0`}>
@@ -239,6 +242,17 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
 
       {/* Navigation */}
       <nav className={`mt-2 ${sidebarCollapsed ? 'px-2' : padding} space-y-4 overflow-y-auto flex-1`}>
+        {/* Dashboard - standalone item */}
+        <div className="space-y-1">
+          {renderNavItem(dashboardItem)}
+        </div>
+        
+        {/* Separator */}
+        {!sidebarCollapsed && (
+          <div className="border-t border-border"></div>
+        )}
+        
+        {/* Navigation Groups */}
         {menuGroups.map((group, groupIndex) => {
           return (
             <div key={groupIndex} className="space-y-2">

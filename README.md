@@ -327,7 +327,7 @@ NEXT_PUBLIC_TIMEZONE=Europe/London
 **Usage in components:**
 
 ```typescript
-import { formatDateTime, formatAmount, getCurrentDateTime, formatDateTimeWithTimezone } from '@/lib/locale-utils';
+import { formatDateTime, formatAmount, getCurrentDateTime, formatDateTimeWithTimezone } from '@/lib/utils';
 
 // Format currency amounts
 const formattedPrice = formatAmount(1234.56); // "₹1,234.56" (India) or "$1,234.56" (US)

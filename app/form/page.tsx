@@ -50,7 +50,7 @@ const formSchema = z.object({
   
   // Date field
   birthDate: z.date({
-    required_error: "Please select a birth date",
+    message: "Please select a birth date",
   }).optional(),
   
   // Company Information
@@ -61,18 +61,18 @@ const formSchema = z.object({
     .min(2, "Position must be at least 2 characters")
     .max(100, "Position must be less than 100 characters"),
   department: z.string({
-    required_error: "Please select a department",
+    message: "Please select a department",
   }).min(1, "Department is required"),
   
   // Project Details
   projectType: z.string({
-    required_error: "Please select a project type",
+    message: "Please select a project type",
   }).min(1, "Project type is required"),
   budget: z.string({
-    required_error: "Please select a budget range",
+    message: "Please select a budget range",
   }).min(1, "Budget range is required"),
   timeline: z.string({
-    required_error: "Please select a timeline",
+    message: "Please select a timeline",
   }).min(1, "Timeline is required"),
   
   // Additional Information
@@ -82,7 +82,7 @@ const formSchema = z.object({
   requirements: z.array(z.string()).refine((value) => value.some((item) => item), {
     message: "Please select at least one service requirement",
   }),
-  newsletter: z.boolean().default(false),
+  newsletter: z.boolean(),
   terms: z.boolean().refine((value) => value === true, {
     message: "You must accept the terms and conditions to proceed",
   }),
@@ -162,7 +162,7 @@ const initialRequirements = [
   { id: "testing", label: "Quality Assurance & Testing" },
 ];
 
-export default function FormsPage() {
+export default function FormPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -226,9 +226,9 @@ export default function FormsPage() {
       
       form.reset();
       
-      // Redirect to simple tables directly without showing toast here
+      // Redirect to table directly without showing toast here
       // The toast will be shown on the tables page
-      router.push('/simple-tables?saved=true');
+      router.push('/table?saved=true');
     } catch (error) {
       console.error('Form save error:', error);
       toast({
@@ -253,7 +253,7 @@ export default function FormsPage() {
   return (
     <DashboardLayout>
       <FormContainer 
-        title="Forms" 
+        title="Form" 
         description="Please fill out all required fields to submit your request"
       >
         {validationErrors.length > 0 && (

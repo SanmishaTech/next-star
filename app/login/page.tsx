@@ -2,31 +2,46 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { AuthLayout } from '@/components/layouts/AuthLayout';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Form } from "@/components/ui/form";
+import { EmailInput, LoadingButton, PasswordInput, CheckboxInput } from '@/components/custom';
 import { useClientOnly } from '@/hooks/useAuth';
 
+// Validation schema
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  rememberMe: z.boolean(),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
   const isClient = useClientOnly();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const handleSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError('');
 
     try {
       // Simulate authentication - replace with actual API call
-      if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
+      if (data.email === 'admin@example.com' && data.password === 'admin123') {
         // Store auth token in both localStorage and cookies (only on client)
         if (isClient) {
           localStorage.setItem('authToken', 'mock-jwt-token');
@@ -44,18 +59,11 @@ export default function LoginPage() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   return (
     <AuthLayout
-      title="ERP Admin"
+      title="Welcome Back"
       subtitle="Sign in to your account"
+      variant="split"
     >
       {/* Error Message */}
       {error && (
@@ -65,87 +73,48 @@ export default function LoginPage() {
       )}
 
       {/* Login Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Email Field */}
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email Address
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleInputChange}
-              className="pl-10"
-              placeholder="Enter your email"
-            />
-          </div>
-        </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          {/* Email Field */}
+          <EmailInput
+            control={form.control}
+            name="email"
+            required
+            placeholder="Enter your email"
+          />
 
-        {/* Password Field */}
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-sm font-medium">
-            Password
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              required
-              value={formData.password}
-              onChange={handleInputChange}
-              className="pl-10 pr-10"
-              placeholder="Enter your password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
-          </div>
-        </div>
+          {/* Password Field */}
+          <PasswordInput
+            control={form.control}
+            name="password"
+            required
+            placeholder="Enter your password"
+          />
 
-        {/* Remember Me & Forgot Password */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <input
-              id="remember-me"
-              name="remember-me"
-              type="checkbox"
-              className="h-4 w-4 text-primary focus:ring-primary border-input rounded"
+          {/* Remember Me & Forgot Password */}
+          <div className="flex items-center justify-between">
+            <CheckboxInput
+              control={form.control}
+              name="rememberMe"
+              label="Remember me"
             />
-            <label htmlFor="remember-me" className="text-sm">
-              Remember me
-            </label>
+            <div className="text-sm">
+              <Link href="/forgot-password" className="font-medium text-primary hover:text-primary/80">
+                Forgot password?
+              </Link>
+            </div>
           </div>
-          <div className="text-sm">
-            <a href="/forgot-password" className="font-medium text-primary hover:text-primary/80">
-              Forgot password?
-            </a>
-          </div>
-        </div>
 
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="w-full"
-        >
-          {isLoading ? 'Signing in...' : 'Sign in'}
-        </Button>
-      </form>
+          {/* Submit Button */}
+          <LoadingButton
+            type="submit"
+            loading={isLoading}
+            className="w-full"
+          >
+            Sign in
+          </LoadingButton>
+        </form>
+      </Form>
 
       {/* Demo Credentials */}
       <div className="mt-6 p-4 bg-muted rounded-lg">
@@ -160,9 +129,9 @@ export default function LoginPage() {
       <div className="mt-6 text-center">
         <p className="text-sm text-muted-foreground">
           Don't have an account?{' '}
-          <a href="/register" className="font-medium text-primary hover:text-primary/80">
+          <Link href="/register" className="font-medium text-primary hover:text-primary/80">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </AuthLayout>

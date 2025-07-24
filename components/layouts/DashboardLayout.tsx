@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen min-h-screen bg-background">
       {/* Navbar/Sidebar */}
       <Navbar
         sidebarCollapsed={sidebarCollapsed}
@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-screen">
         {/* Header */}
         <Header
           sidebarCollapsed={sidebarCollapsed}
@@ -41,9 +41,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1">
+        <main className="flex-1 overflow-y-auto">
           <TooltipProvider>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 min-h-full">
               {children}
             </div>
           </TooltipProvider>

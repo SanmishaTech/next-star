@@ -43,12 +43,18 @@ interface HeaderProps {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  handleSearch: (query: string) => void;
 }
 
 export default function Header({
   sidebarCollapsed,
   setSidebarCollapsed,
   setSidebarOpen,
+  searchQuery,
+  setSearchQuery,
+  handleSearch,
 }: HeaderProps) {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const router = useRouter();

@@ -8,6 +8,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescripti
 import { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { getDateFormat } from '@/lib/utils';
 
 export interface DatePickerProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -23,6 +24,11 @@ export interface DatePickerProps<
   minDate?: Date;
   maxDate?: Date;
   className?: string;
+  /** 
+   * Date format string for date-fns format function.
+   * If not provided, uses NEXT_PUBLIC_DATE_FORMAT from environment variables.
+   * Common formats: 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy-MM-dd', 'PPP'
+   */
   dateFormat?: string;
 }
 
@@ -40,7 +46,7 @@ export function DatePicker<
   minDate,
   maxDate,
   className = "",
-  dateFormat = "PPP"
+  dateFormat = getDateFormat() // Use environment-based date format as default
 }: DatePickerProps<TFieldValues, TName>) {
   const [open, setOpen] = useState(false);
 

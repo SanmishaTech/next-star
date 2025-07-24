@@ -1,11 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Control, FieldPath, FieldValues } from 'react-hook-form';
-import { Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock } from 'lucide-react';
 
-export interface EmailInputProps<
+export interface PasswordInputProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > {
@@ -16,24 +17,24 @@ export interface EmailInputProps<
   description?: string;
   required?: boolean;
   disabled?: boolean;
-  autoFocus?: boolean;
   className?: string;
 }
 
-export function EmailInput<
+export function PasswordInput<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
   control,
   name,
-  label = "Email Address",
-  placeholder = "john.doe@example.com",
+  label = "Password",
+  placeholder = "Enter your password",
   description,
   required = false,
   disabled = false,
-  autoFocus = false,
-  className,
-}: EmailInputProps<TFieldValues, TName>) {
+  className = ""
+}: PasswordInputProps<TFieldValues, TName>) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <FormField
       control={control}
@@ -45,15 +46,26 @@ export function EmailInput<
           </FormLabel>
           <FormControl>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                type="email"
+                type={showPassword ? 'text' : 'password'}
                 placeholder={placeholder}
                 disabled={disabled}
-                autoFocus={autoFocus}
-                className="pl-10"
+                className="pl-10 pr-10"
                 {...field}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                disabled={disabled}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
             </div>
           </FormControl>
           {description && (

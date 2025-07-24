@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
 import { SortableHeader, ViewButton, EditButton, DeleteButton, ButtonGroup, TablePagination, SearchInput } from "@/components/custom";
-import { formatDateTime, formatAmount, formatDate } from '@/lib/locale-utils';
+import { formatDateTime, formatAmount, formatDate } from '@/lib/utils';
 import { toast } from "@/hooks/useToast";
 import {
   Plus,
@@ -71,7 +71,7 @@ const users: User[] = [
   { id: 37, name: 'Timothy Collins', email: 'timothy@example.com', role: 'Developer', status: 'Active', joined: '2024-04-22', lastLogin: '2024-07-23 11:40:00', amount: 78500.00 },
 ];
 
-export default function SimpleTablesPage() {
+function TableContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
@@ -146,7 +146,7 @@ export default function SimpleTablesPage() {
   };
 
   const handleEdit = (id: number | string) => {
-    router.push(`/forms?edit=${id}`);
+    router.push(`/form?edit=${id}`);
   };
 
   const handleDelete = (id: number | string) => {
@@ -156,7 +156,7 @@ export default function SimpleTablesPage() {
   };
 
   const handleCreateNew = () => {
-    router.push('/forms');
+    router.push('/form');
   };
 
   const handleExport = () => {
@@ -311,5 +311,23 @@ export default function SimpleTablesPage() {
           </CardContent>
         </Card>
     </DashboardLayout>
+  );
+}
+
+export default function TablePage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <Card>
+          <CardContent className="p-8">
+            <div className="flex items-center justify-center">
+              <div className="text-muted-foreground">Loading...</div>
+            </div>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
+    }>
+      <TableContent />
+    </Suspense>
   );
 }
