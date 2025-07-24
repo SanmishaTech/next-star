@@ -12,6 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
+    "test:login": "node scripts/test-login.js",
+    "test:active-user": "node scripts/test-active-user.js",
     "postinstall": "prisma generate"
   },
   "prisma": {

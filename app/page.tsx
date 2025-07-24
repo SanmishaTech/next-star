@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useClientOnly } from '@/hooks/useAuth';
+import { AuthService } from '@/lib/authService';
 
 export default function Home() {
   const router = useRouter();
@@ -12,9 +13,21 @@ export default function Home() {
     if (!isClient) return;
     
     // Check if user is authenticated (only on client side)
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      router.push('/dashboard');
+    const authState = AuthService.getAuthState();
+    
+    if (authState.isAuthenticated) {
+      // Verify token is still valid
+      AuthService.verifyToken()
+        .then(({ valid }) => {
+          if (valid) {
+            router.push('/dashboard');
+          } else {
+            router.push('/login');
+          }
+        })
+        .catch(() => {
+          router.push('/login');
+        });
     } else {
       router.push('/login');
     }

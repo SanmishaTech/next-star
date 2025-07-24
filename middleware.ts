@@ -1,39 +1,134 @@
+/**
+ * Next.js Middleware for route-based authentication and authorization
+ */
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import jwt from 'jsonwebtoken';
+import { canAccessRoute, hasPermission } from '@/lib/config/roles';
+
+// Define protected routes and their required permissions
+const PROTECTED_ROUTES = {
+  '/dashboard': 'dashboard:view',
+  '/users': 'user:manage',
+  '/admin': 'dashboard:admin',
+  '/settings': 'settings:manage',
+} as const;
+
+// Routes that require authentication but no specific permissions
+const AUTH_REQUIRED_ROUTES = [
+  '/dashboard',
+  '/profile',
+  '/settings',
+] as const;
+
+// Public routes that don't require authentication
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+] as const;
+
+function getTokenFromRequest(request: NextRequest): string | null {
+  // Check Authorization header
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+
+  // Check cookies (both authToken and auth-token)
+  const tokenCookie = request.cookies.get('authToken') || request.cookies.get('auth-token');
+  if (tokenCookie) {
+    return tokenCookie.value;
+  }
+
+  return null;
+}
+
+function verifyToken(token: string): { userId: number; email: string; role: string } | null {
+  try {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('JWT_SECRET is not configured');
+      return null;
+    }
+
+    const decoded = jwt.verify(token, jwtSecret) as any;
+    
+    return {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+    };
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    return null;
+  }
+}
 
 export function middleware(request: NextRequest) {
-  // Get the pathname of the request (e.g. /, /dashboard, /login)
   const { pathname } = request.nextUrl;
 
-  // Define public paths that don't require authentication
-  const publicPaths = ['/login', '/register', '/forgot-password', '/'];
-
-  // Check if the current path is public
-  const isPublicPath = publicPaths.includes(pathname);
-
-  // All routes require authentication except public paths
-  const requiresAuth = !isPublicPath;
-
-  // Get the token from the request cookies
-  const token = request.cookies.get('authToken')?.value;
-
-  // If the user is on a public path and has a token, redirect to dashboard
-  if (isPublicPath && token && (pathname === '/login' || pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  // Skip middleware for API routes, static files, and public assets
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/public/') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
   }
 
-  // If the user is not on a public path and doesn't have a token, redirect to login
-  if (requiresAuth && !token) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  // For the root path, redirect to login if no token, dashboard if token exists
-  if (pathname === '/') {
-    if (token) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    } else {
-      return NextResponse.redirect(new URL('/login', request.url));
+  // Check if route is public
+  if (PUBLIC_ROUTES.includes(pathname as any)) {
+    // For root path, redirect based on auth status
+    if (pathname === '/') {
+      const token = getTokenFromRequest(request);
+      const user = token ? verifyToken(token) : null;
+      
+      if (user) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      } else {
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
     }
+    
+    return NextResponse.next();
+  }
+
+  // Get token from request
+  const token = getTokenFromRequest(request);
+  const user = token ? verifyToken(token) : null;
+
+  // Check if route requires authentication
+  const requiresAuth = AUTH_REQUIRED_ROUTES.some(route => pathname.startsWith(route)) ||
+                      Object.keys(PROTECTED_ROUTES).some(route => pathname.startsWith(route));
+  
+  if (requiresAuth && !user) {
+    // Redirect to login if authentication is required
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Check route-specific permissions
+  const protectedRoute = Object.keys(PROTECTED_ROUTES).find(route => pathname.startsWith(route));
+  
+  if (protectedRoute && user) {
+    const requiredPermission = PROTECTED_ROUTES[protectedRoute as keyof typeof PROTECTED_ROUTES];
+    
+    if (!hasPermission(user.role, requiredPermission)) {
+      // Redirect to unauthorized page or dashboard
+      const unauthorizedUrl = new URL('/dashboard', request.url); // Redirect to dashboard for now
+      return NextResponse.redirect(unauthorizedUrl);
+    }
+  }
+
+  // If user is authenticated and trying to access login/register, redirect to dashboard
+  if (user && (pathname === '/login' || pathname === '/register')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();

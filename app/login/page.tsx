@@ -10,6 +10,7 @@ import { AuthLayout } from '@/components/layouts/AuthLayout';
 import { Form } from "@/components/ui/form";
 import { EmailInput, LoadingButton, PasswordInput, CheckboxInput } from '@/components/custom';
 import { useClientOnly } from '@/hooks/useAuth';
+import { AuthService } from '@/lib/authService';
 
 // Validation schema
 const loginSchema = z.object({
@@ -40,20 +41,17 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Simulate authentication - replace with actual API call
-      if (data.email === 'admin@example.com' && data.password === 'admin123') {
-        // Store auth token in both localStorage and cookies (only on client)
-        if (isClient) {
-          localStorage.setItem('authToken', 'mock-jwt-token');
-          // Set cookie for middleware
-          document.cookie = 'authToken=mock-jwt-token; path=/; max-age=86400'; // 24 hours
-        }
+      const result = await AuthService.login(data.email, data.password, data.rememberMe);
+
+      if (result.success) {
+        // Redirect to dashboard
         router.push('/dashboard');
       } else {
-        setError('Invalid email or password');
+        setError(result.error || 'Login failed');
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +119,7 @@ export default function LoginPage() {
         <p className="text-sm text-muted-foreground text-center">
           <strong>Demo Credentials:</strong><br />
           Email: admin@example.com<br />
-          Password: admin123
+          Password: admin123@
         </p>
       </div>
 

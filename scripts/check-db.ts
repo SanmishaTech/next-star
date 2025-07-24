@@ -14,6 +14,7 @@ async function checkDatabase() {
       console.log(`  Name: ${user.name}`);
       console.log(`  Email: ${user.email}`);
       console.log(`  Role: ${user.role}`);
+      console.log(`  Status: ${user.status} (${user.status ? 'Active' : 'Inactive'})`);
       console.log(`  Created: ${user.createdAt}`);
       console.log('  ---');
     });
