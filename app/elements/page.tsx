@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Form } from "@/components/ui/form";
 import { 
   TextInput,
@@ -24,6 +25,7 @@ import {
   LoadingButton
 } from '@/components/custom';
 import { useToast } from "@/hooks/useToast";
+import { formatAmount, formatDate } from "@/lib/utils";
 import { 
   AlertCircle, 
   CheckCircle, 
@@ -56,6 +58,15 @@ const testFormSchema = z.object({
 
 type TestFormData = z.infer<typeof testFormSchema>;
 
+// Sample dashboard data
+const dashboardData = [
+  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', lastLogin: '2024-07-23', revenue: 12500 },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Manager', status: 'Active', lastLogin: '2024-07-22', revenue: 8750 },
+  { id: 3, name: 'Mike Johnson', email: 'mike@example.com', role: 'User', status: 'Inactive', lastLogin: '2024-07-20', revenue: 3200 },
+  { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com', role: 'Manager', status: 'Active', lastLogin: '2024-07-23', revenue: 9840 },
+  { id: 5, name: 'Tom Brown', email: 'tom@example.com', role: 'User', status: 'Active', lastLogin: '2024-07-21', revenue: 5630 },
+];
+
 export default function ElementsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(45);
@@ -74,6 +85,18 @@ export default function ElementsPage() {
 
   // Toast hook destructuring
   const { toast, success, error, warning, info } = useToast();
+
+  // Helper function to get status badge variant
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'Active':
+        return 'default';
+      case 'Inactive':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
 
   // Category options for select input
   const categoryOptions = [
@@ -142,156 +165,149 @@ export default function ElementsPage() {
   };
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">UI Elements</h1>
-          <p className="text-muted-foreground">
-            Explore the available UI components and their variations
-          </p>
-        </div>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-xl font-bold">UI Elements</CardTitle>
+            <p className="text-muted-foreground">
+              Explore the available UI components and their variations
+            </p>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Tabs for different categories */}
+          <Tabs defaultValue="components" className="w-full">
+            <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-muted/50 rounded-xl">
+              <TabsTrigger 
+                value="components" 
+                className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+              >
+                <Palette className="h-4 w-4" />
+                <span className="text-xs font-medium">Components</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="forms" 
+                className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+              >
+                <FormInput className="h-4 w-4" />
+                <span className="text-xs font-medium">Forms</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="feedback" 
+                className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span className="text-xs font-medium">Feedback</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="data" 
+                className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span className="text-xs font-medium">Data Display</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="toasts" 
+                className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span className="text-xs font-medium">Toasts</span>
+              </TabsTrigger>
+            </TabsList>
 
-        {/* Tabs for different categories */}
-        <Tabs defaultValue="components" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-muted/50 rounded-xl">
-            <TabsTrigger 
-              value="components" 
-              className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
-            >
-              <Palette className="h-4 w-4" />
-              <span className="text-xs font-medium">Components</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="forms" 
-              className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
-            >
-              <FormInput className="h-4 w-4" />
-              <span className="text-xs font-medium">Forms</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="feedback" 
-              className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
-            >
-              <MessageSquare className="h-4 w-4" />
-              <span className="text-xs font-medium">Feedback</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="data" 
-              className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span className="text-xs font-medium">Data Display</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="toasts" 
-              className="flex flex-col gap-1 py-3 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span className="text-xs font-medium">Toasts</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Components Tab */}
-          <TabsContent value="components" className="space-y-6 mt-6">
-            <div className="grid gap-6">
-              {/* Buttons */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-t-lg">
-                  <CardTitle className="flex items-center gap-2">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                      <Palette className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            {/* Components Tab */}
+            <TabsContent value="components" className="space-y-6 mt-6">
+              <div className="grid gap-6">
+                {/* Buttons */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Palette className="h-4 w-4" />
+                      Buttons
+                    </CardTitle>
+                    <CardDescription>Different button variants and sizes</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div>
+                      <h4 className="text-sm font-medium mb-3 text-muted-foreground">Button Variants</h4>
+                      <div className="flex flex-wrap gap-3">
+                        <Button variant="default">Default</Button>
+                        <Button variant="secondary">Secondary</Button>
+                        <Button variant="destructive">Destructive</Button>
+                        <Button variant="outline">Outline</Button>
+                        <Button variant="ghost">Ghost</Button>
+                        <Button variant="link">Link</Button>
+                      </div>
                     </div>
-                    Buttons
-                  </CardTitle>
-                  <CardDescription>Different button variants and sizes</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  <div>
-                    <h4 className="text-sm font-medium mb-3 text-muted-foreground">Button Variants</h4>
+                    <div>
+                      <h4 className="text-sm font-medium mb-3 text-muted-foreground">Button Sizes</h4>
+                      <div className="flex flex-wrap gap-3 items-center">
+                        <Button size="sm">Small</Button>
+                        <Button size="default">Default</Button>
+                        <Button size="lg">Large</Button>
+                        <Button size="icon"><Star className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Badges */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Star className="h-4 w-4" />
+                      Badges
+                    </CardTitle>
+                    <CardDescription>Status indicators and labels</CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="default">Default</Button>
-                      <Button variant="secondary">Secondary</Button>
-                      <Button variant="destructive">Destructive</Button>
-                      <Button variant="outline">Outline</Button>
-                      <Button variant="ghost">Ghost</Button>
-                      <Button variant="link">Link</Button>
+                      <Badge variant="default" className="px-3 py-1">Default</Badge>
+                      <Badge variant="secondary" className="px-3 py-1">Secondary</Badge>
+                      <Badge variant="destructive" className="px-3 py-1">Destructive</Badge>
+                      <Badge variant="outline" className="px-3 py-1">Outline</Badge>
                     </div>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium mb-3 text-muted-foreground">Button Sizes</h4>
-                    <div className="flex flex-wrap gap-3 items-center">
-                      <Button size="sm">Small</Button>
-                      <Button size="default">Default</Button>
-                      <Button size="lg">Large</Button>
-                      <Button size="icon"><Star className="h-4 w-4" /></Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              {/* Badges */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-t-lg">
+                {/* Avatars */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Avatars
+                    </CardTitle>
+                    <CardDescription>User profile pictures and placeholders</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-4 items-center">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback><User className="h-5 w-5" /></AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Forms Tab */}
+            <TabsContent value="forms" className="space-y-6 mt-6">
+              <Card>
+                <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                      <Star className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    </div>
-                    Badges
+                    <FormInput className="h-4 w-4" />
+                    Reusable Form Components
                   </CardTitle>
-                  <CardDescription>Status indicators and labels</CardDescription>
+                  <CardDescription>Test form with validation using custom components</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="flex flex-wrap gap-3">
-                    <Badge variant="default" className="px-3 py-1">Default</Badge>
-                    <Badge variant="secondary" className="px-3 py-1">Secondary</Badge>
-                    <Badge variant="destructive" className="px-3 py-1">Destructive</Badge>
-                    <Badge variant="outline" className="px-3 py-1">Outline</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Avatars */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20 rounded-t-lg">
-                  <CardTitle className="flex items-center gap-2">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                      <User className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    Avatars
-                  </CardTitle>
-                  <CardDescription>User profile pictures and placeholders</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="flex gap-4 items-center">
-                    <Avatar className="h-12 w-12 border-2 border-muted">
-                      <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <Avatar className="h-12 w-12 border-2 border-muted">
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                    <Avatar className="h-12 w-12 border-2 border-muted">
-                      <AvatarFallback><User className="h-5 w-5" /></AvatarFallback>
-                    </Avatar>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Forms Tab */}
-          <TabsContent value="forms" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                    <FormInput className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  </div>
-                  Reusable Form Components
-                </CardTitle>
-                <CardDescription>Test form with validation using custom components</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
+                <CardContent>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -369,26 +385,24 @@ export default function ElementsPage() {
           {/* Feedback Tab */}
           <TabsContent value="feedback" className="space-y-6 mt-6">
             <div className="grid gap-6">
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-950/20 dark:to-pink-950/20 rounded-t-lg">
+              <Card>
+                <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-lg">
-                      <MessageSquare className="h-4 w-4 text-rose-600 dark:text-rose-400" />
-                    </div>
+                    <MessageSquare className="h-4 w-4" />
                     Alerts
                   </CardTitle>
                   <CardDescription>Contextual feedback messages</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  <Alert className="border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30">
-                    <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    <AlertTitle className="text-blue-800 dark:text-blue-200">Heads up!</AlertTitle>
-                    <AlertDescription className="text-blue-700 dark:text-blue-300">
+                <CardContent className="space-y-4">
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Heads up!</AlertTitle>
+                    <AlertDescription>
                       You can add components to your app using the cli.
                     </AlertDescription>
                   </Alert>
 
-                  <Alert variant="destructive" className="border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/30">
+                  <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Error</AlertTitle>
                     <AlertDescription>
@@ -396,16 +410,16 @@ export default function ElementsPage() {
                     </AlertDescription>
                   </Alert>
 
-                  <Alert className="border-green-200 bg-green-50/50 text-green-800 dark:border-green-800 dark:bg-green-950/30 dark:text-green-200">
-                    <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <Alert className="border-green-200 text-green-800 dark:border-green-900/50 dark:text-green-400">
+                    <CheckCircle className="h-4 w-4" />
                     <AlertTitle>Success</AlertTitle>
                     <AlertDescription>
                       Your changes have been saved successfully.
                     </AlertDescription>
                   </Alert>
 
-                  <Alert className="border-amber-200 bg-amber-50/50 text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
-                    <Info className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <Alert className="border-blue-200 text-blue-800 dark:border-blue-900/50 dark:text-blue-400">
+                    <Info className="h-4 w-4" />
                     <AlertTitle>Information</AlertTitle>
                     <AlertDescription>
                       New features are available in this version.
@@ -414,37 +428,35 @@ export default function ElementsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-cyan-950/20 dark:to-teal-950/20 rounded-t-lg">
+              <Card>
+                <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <div className="p-2 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg">
-                      <BarChart3 className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                    </div>
+                    <BarChart3 className="h-4 w-4" />
                     Progress
                   </CardTitle>
                   <CardDescription>Progress indicators and loading states</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm font-medium">
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
                       <span>Processing progress</span>
-                      <span className="text-blue-600 dark:text-blue-400">{progress}%</span>
+                      <span>{progress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2" />
+                    <Progress value={progress} />
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm font-medium">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
                       <span>Download progress</span>
-                      <span className="text-green-600 dark:text-green-400">80%</span>
+                      <span>80%</span>
                     </div>
-                    <Progress value={80} className="h-2" />
+                    <Progress value={80} />
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm font-medium">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
                       <span>Installation progress</span>
-                      <span className="text-emerald-600 dark:text-emerald-400">100%</span>
+                      <span>100%</span>
                     </div>
-                    <Progress value={100} className="h-2" />
+                    <Progress value={100} />
                   </div>
                 </CardContent>
               </Card>
@@ -453,97 +465,138 @@ export default function ElementsPage() {
 
           {/* Data Display Tab */}
           <TabsContent value="data" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/20 rounded-t-lg">
+            <Card>
+              <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                    <BarChart3 className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                  </div>
+                  <BarChart3 className="h-4 w-4" />
+                  Dashboard Data Table
+                </CardTitle>
+                <CardDescription>Example of tabular data display for dashboards</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">ID</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Last Login</TableHead>
+                        <TableHead className="text-right">Revenue</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {dashboardData.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">{user.id}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="text-xs">
+                                  {user.name.split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              {user.name}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="capitalize">
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={getStatusVariant(user.status)}>
+                              {user.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{formatDate(user.lastLogin)}</TableCell>
+                          <TableCell className="text-right font-medium">
+                            {formatAmount(user.revenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
                   Cards & Layout
                 </CardTitle>
                 <CardDescription>Content containers and separators</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="hover:shadow-lg transition-shadow duration-300 border-0 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/10 dark:to-rose-950/10">
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-3 text-lg">
-                        <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                          <Heart className="h-5 w-5 text-red-500" />
-                        </div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Heart className="h-4 w-4 text-red-500" />
                         Favorites
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">
+                      <p className="text-sm text-muted-foreground">
                         Your most loved items
                       </p>
-                      <div className="flex items-center justify-between">
-                        <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">24 items</Badge>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                          <Heart className="h-4 w-4" />
-                        </Button>
+                      <div className="mt-2">
+                        <Badge variant="secondary">24 items</Badge>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="hover:shadow-lg transition-shadow duration-300 border-0 bg-gradient-to-br from-blue-50 to-sky-50 dark:from-blue-950/10 dark:to-sky-950/10">
+                  <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-3 text-lg">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                          <Share2 className="h-5 w-5 text-blue-500" />
-                        </div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Share2 className="h-4 w-4 text-blue-500" />
                         Shared
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">
+                      <p className="text-sm text-muted-foreground">
                         Files shared with you
                       </p>
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300">12 files</Badge>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                          <Share2 className="h-4 w-4" />
-                        </Button>
+                      <div className="mt-2">
+                        <Badge variant="outline">12 files</Badge>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="hover:shadow-lg transition-shadow duration-300 border-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/10 dark:to-emerald-950/10">
+                  <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-3 text-lg">
-                        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                          <Download className="h-5 w-5 text-green-500" />
-                        </div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Download className="h-4 w-4 text-green-500" />
                         Downloads
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">
+                      <p className="text-sm text-muted-foreground">
                         Your downloaded content
                       </p>
-                      <div className="flex items-center justify-between">
-                        <Badge variant="destructive" className="bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800">8 pending</Badge>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                          <Download className="h-4 w-4" />
-                        </Button>
+                      <div className="mt-2">
+                        <Badge variant="destructive">8 pending</Badge>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
 
-                <Separator className="my-8" />
+                <Separator />
 
-                <div className="rounded-lg bg-muted/30 p-6">
-                  <h4 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                    <div className="p-1 bg-primary/10 rounded">
-                      <Separator className="h-4 w-4" />
-                    </div>
-                    Separator Usage
-                  </h4>
-                  <p className="text-muted-foreground">
-                    Separators help organize content sections visually and create clear divisions between different areas of your interface.
-                  </p>
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Data Display Features</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Responsive table layout with proper spacing</li>
+                    <li>• Avatar integration for user identification</li>
+                    <li>• Badge variants for status and role display</li>
+                    <li>• Currency formatting for financial data</li>
+                    <li>• Consistent typography and alignment</li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>
@@ -551,117 +604,88 @@ export default function ElementsPage() {
 
           {/* Toasts Tab */}
           <TabsContent value="toasts" className="space-y-6 mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/20 dark:to-purple-950/20 rounded-t-lg">
+            <Card>
+              <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
-                    <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                  </div>
+                  <Sparkles className="h-4 w-4" />
                   Toast Notifications
                 </CardTitle>
-                <CardDescription>Test different types of toast notifications with enhanced UI</CardDescription>
+                <CardDescription>Test different types of toast notifications</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6 pt-6">
+              <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   <Button 
                     onClick={showSuccessToast}
-                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
                   >
                     <CheckCircle className="h-4 w-4" />
-                    Success
+                    Success Toast
                   </Button>
                   
                   <Button 
                     onClick={showErrorToast}
-                    className="flex items-center gap-2 bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
                   >
                     <AlertTriangle className="h-4 w-4" />
-                    Error
+                    Error Toast
                   </Button>
                   
                   <Button 
                     onClick={showWarningToast}
-                    className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700"
                   >
                     <AlertTriangle className="h-4 w-4" />
-                    Warning
+                    Warning Toast
                   </Button>
                   
                   <Button 
                     onClick={showInfoToast}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
                   >
                     <Info className="h-4 w-4" />
-                    Info
+                    Info Toast
                   </Button>
                   
                   <Button 
                     onClick={showLoadingToast}
                     variant="secondary"
                     disabled={isLoading}
-                    className="flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:transform-none"
+                    className="flex items-center gap-2"
                   >
                     <Zap className="h-4 w-4" />
-                    {isLoading ? 'Processing...' : 'Loading'}
+                    {isLoading ? 'Processing...' : 'Loading Toast'}
                   </Button>
                 </div>
 
                 <Separator />
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <h4 className="text-lg font-semibold flex items-center gap-2">
-                      <div className="p-1 bg-primary/10 rounded">
-                        <Sparkles className="h-4 w-4" />
-                      </div>
-                      Toast Features
-                    </h4>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                        Automatic dismissal after 5 seconds
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                        Manual dismissal with close button
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                        Four variants: Success, Error, Warning, and Info
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                        Contextual icons and color coding
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
-                        Dark mode support
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
-                        Stacked notifications (up to 3)
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full"></div>
-                        Helper functions for easy usage
-                      </li>
-                    </ul>
-                  </div>
-
-                  <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 dark:border-amber-800 dark:from-amber-950/20 dark:to-yellow-950/20">
-                    <Bell className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                    <AlertTitle className="text-amber-800 dark:text-amber-200">Testing Tips</AlertTitle>
-                    <AlertDescription className="text-amber-700 dark:text-amber-300">
-                      Click the buttons above to test different toast notifications with success, error, warning, and info variants. 
-                      Each toast includes contextual icons and appropriate color schemes for better user experience.
-                    </AlertDescription>
-                  </Alert>
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Toast Features</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Automatic dismissal after 5 seconds</li>
+                    <li>• Manual dismissal with close button</li>
+                    <li>• Four variants: Success, Error, Warning, and Info</li>
+                    <li>• Contextual icons and color coding</li>
+                    <li>• Dark mode support</li>
+                    <li>• Stacked notifications (up to 3)</li>
+                    <li>• Helper functions for easy usage</li>
+                  </ul>
                 </div>
+
+                <Alert>
+                  <Bell className="h-4 w-4" />
+                  <AlertTitle>Testing Tips</AlertTitle>
+                  <AlertDescription>
+                    Click the buttons above to test different toast notifications with success, error, warning, and info variants. 
+                    Each toast includes contextual icons and appropriate color schemes for better user experience.
+                  </AlertDescription>
+                </Alert>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+        </CardContent>
+      </Card>
     </DashboardLayout>
   );
 }
