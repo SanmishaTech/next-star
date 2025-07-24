@@ -24,6 +24,7 @@ model User {
   emailVerified            DateTime?
   verificationToken        String?
   verificationTokenExpiry  DateTime?
+  status                   Boolean   @default(true)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 }
