@@ -4,7 +4,7 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '@/lib/auth';
 import { canAccessRoute, hasPermission } from '@/lib/config/roles';
 
 // Define protected routes and their required permissions
@@ -47,28 +47,7 @@ function getTokenFromRequest(request: NextRequest): string | null {
   return null;
 }
 
-function verifyToken(token: string): { userId: number; email: string; role: string } | null {
-  try {
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      console.error('JWT_SECRET is not configured');
-      return null;
-    }
-
-    const decoded = jwt.verify(token, jwtSecret) as any;
-    
-    return {
-      userId: decoded.userId,
-      email: decoded.email,
-      role: decoded.role,
-    };
-  } catch (error) {
-    console.error('Token verification failed:', error);
-    return null;
-  }
-}
-
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip middleware for API routes, static files, and public assets
@@ -86,7 +65,7 @@ export function middleware(request: NextRequest) {
     // For root path, redirect based on auth status
     if (pathname === '/') {
       const token = getTokenFromRequest(request);
-      const user = token ? verifyToken(token) : null;
+      const user = token ? await verifyToken(token) : null;
       
       if (user) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -100,7 +79,7 @@ export function middleware(request: NextRequest) {
 
   // Get token from request
   const token = getTokenFromRequest(request);
-  const user = token ? verifyToken(token) : null;
+  const user = token ? await verifyToken(token) : null;
 
   // Check if route requires authentication
   const requiresAuth = AUTH_REQUIRED_ROUTES.some(route => pathname.startsWith(route)) ||

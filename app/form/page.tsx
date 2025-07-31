@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { Form } from "@/components/ui/form";
 import {
-  FormContainer,
   FormSection,
   FormFieldGroup,
   FormActions,
@@ -29,6 +28,7 @@ import {
   Calendar as CalendarIconLucide,
 } from 'lucide-react';
 import { toast } from "@/hooks/useToast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Form validation schema
 const formSchema = z.object({
@@ -252,184 +252,189 @@ export default function FormPage() {
 
   return (
     <DashboardLayout>
-      <FormContainer 
-        title="Form" 
-        description="Please fill out all required fields to submit your request"
-      >
-        {validationErrors.length > 0 && (
-          <ValidationSummary errors={validationErrors} />
-        )}
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            
-            {/* Personal Information Section */}
-            <FormSection title="Personal Information" icon={User}>
-              <FormFieldGroup columns={2}>
-                <TextInput
-                  control={form.control}
-                  name="firstName"
-                  label="First Name"
-                  placeholder="John"
-                  required={true}
-                />
-                
-                <TextInput
-                  control={form.control}
-                  name="lastName"
-                  label="Last Name"
-                  placeholder="Doe"
-                  required={true}
-                />
-                
-                <EmailInput
-                  control={form.control}
-                  name="email"
-                  placeholder="john.doe@example.com"
-                  required={true}
-                />
-                
-                <PhoneInput
-                  control={form.control}
-                  name="phone"
-                  placeholder="+1 (555) 123-4567"
-                  required={true}
-                />
-              </FormFieldGroup>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-xl font-bold">Form</CardTitle>
+            <CardDescription>Please fill out all required fields to submit your request</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {validationErrors.length > 0 && (
+            <ValidationSummary errors={validationErrors} />
+          )}
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               
-              <FormFieldGroup columns={1}>
-                <DatePicker
-                  control={form.control}
-                  name="birthDate"
-                  label="Birth Date"
-                  placeholder="Select date of birth"
-                  description="Your date of birth (optional)"
-                  maxDate={new Date()}
-                  minDate={new Date("1900-01-01")}
-                />
-              </FormFieldGroup>
-            </FormSection>
-
-            {/* Company Information Section */}
-            <FormSection title="Company Information" icon={Building}>
-              <FormFieldGroup columns={2}>
-                <TextInput
-                  control={form.control}
-                  name="company"
-                  label="Company Name"
-                  placeholder="Acme Inc."
-                  required={true}
-                />
+              {/* Personal Information Section */}
+              <FormSection title="Personal Information" icon={User}>
+                <FormFieldGroup columns={2}>
+                  <TextInput
+                    control={form.control}
+                    name="firstName"
+                    label="First Name"
+                    placeholder="John"
+                    required={true}
+                  />
+                  
+                  <TextInput
+                    control={form.control}
+                    name="lastName"
+                    label="Last Name"
+                    placeholder="Doe"
+                    required={true}
+                  />
+                  
+                  <EmailInput
+                    control={form.control}
+                    name="email"
+                    placeholder="john.doe@example.com"
+                    required={true}
+                  />
+                  
+                  <PhoneInput
+                    control={form.control}
+                    name="phone"
+                    placeholder="+1 (555) 123-4567"
+                    required={true}
+                  />
+                </FormFieldGroup>
                 
-                <TextInput
-                  control={form.control}
-                  name="position"
-                  label="Position"
-                  placeholder="Product Manager"
-                  required={true}
-                />
-              </FormFieldGroup>
-              
-              <FormFieldGroup columns={1}>
-                <SelectInput
-                  control={form.control}
-                  name="department"
-                  label="Department"
-                  placeholder="Select your department"
-                  options={departmentOptions}
-                  required={true}
-                />
-              </FormFieldGroup>
-            </FormSection>
+                <FormFieldGroup columns={1}>
+                  <DatePicker
+                    control={form.control}
+                    name="birthDate"
+                    label="Birth Date"
+                    placeholder="Select date of birth"
+                    description="Your date of birth (optional)"
+                    maxDate={new Date()}
+                    minDate={new Date("1900-01-01")}
+                  />
+                </FormFieldGroup>
+              </FormSection>
 
-            {/* Project Details Section */}
-            <FormSection title="Project Details" icon={CalendarIconLucide}>
-              <FormFieldGroup columns={3}>
-                <ComboboxInput
-                  control={form.control}
-                  name="projectType"
-                  label="Project Type"
-                  placeholder="Search and select project type..."
-                  searchPlaceholder="Search project types..."
-                  emptyMessage="No project type found."
-                  options={projectTypeOptions}
-                  required={true}
-                />
+              {/* Company Information Section */}
+              <FormSection title="Company Information" icon={Building}>
+                <FormFieldGroup columns={2}>
+                  <TextInput
+                    control={form.control}
+                    name="company"
+                    label="Company Name"
+                    placeholder="Acme Inc."
+                    required={true}
+                  />
+                  
+                  <TextInput
+                    control={form.control}
+                    name="position"
+                    label="Position"
+                    placeholder="Product Manager"
+                    required={true}
+                  />
+                </FormFieldGroup>
                 
-                <SelectInput
-                  control={form.control}
-                  name="budget"
-                  label="Budget Range"
-                  placeholder="Select budget"
-                  options={budgetOptions}
-                  required={true}
-                />
-                
-                <SelectInput
-                  control={form.control}
-                  name="timeline"
-                  label="Timeline"
-                  placeholder="Select timeline"
-                  options={timelineOptions}
-                  required={true}
-                />
-              </FormFieldGroup>
-              
-              <FormFieldGroup columns={1}>
-                <TextareaInput
-                  control={form.control}
-                  name="description"
-                  label="Project Description"
-                  placeholder="Please describe your project requirements, goals, and any specific features you need..."
-                  description="Provide as much detail as possible to help us understand your needs."
-                  rows={5}
-                  maxLength={1000}
-                  showCharacterCount={true}
-                  required={true}
-                />
-              </FormFieldGroup>
-            </FormSection>
+                <FormFieldGroup columns={1}>
+                  <SelectInput
+                    control={form.control}
+                    name="department"
+                    label="Department"
+                    placeholder="Select your department"
+                    options={departmentOptions}
+                    required={true}
+                  />
+                </FormFieldGroup>
+              </FormSection>
 
-            {/* Requirements Section */}
-            <FormSection title="Services Required" description="Select all services that apply to your project.">
-              <CheckboxGroup
-                control={form.control}
-                name="requirements"
-                label="Services Required"
-                options={initialRequirements}
-                columns={2}
-                required={true}
+              {/* Project Details Section */}
+              <FormSection title="Project Details" icon={CalendarIconLucide}>
+                <FormFieldGroup columns={3}>
+                  <ComboboxInput
+                    control={form.control}
+                    name="projectType"
+                    label="Project Type"
+                    placeholder="Search and select project type..."
+                    searchPlaceholder="Search project types..."
+                    emptyMessage="No project type found."
+                    options={projectTypeOptions}
+                    required={true}
+                  />
+                  
+                  <SelectInput
+                    control={form.control}
+                    name="budget"
+                    label="Budget Range"
+                    placeholder="Select budget"
+                    options={budgetOptions}
+                    required={true}
+                  />
+                  
+                  <SelectInput
+                    control={form.control}
+                    name="timeline"
+                    label="Timeline"
+                    placeholder="Select timeline"
+                    options={timelineOptions}
+                    required={true}
+                  />
+                </FormFieldGroup>
+                
+                <FormFieldGroup columns={1}>
+                  <TextareaInput
+                    control={form.control}
+                    name="description"
+                    label="Project Description"
+                    placeholder="Please describe your project requirements, goals, and any specific features you need..."
+                    description="Provide as much detail as possible to help us understand your needs."
+                    rows={5}
+                    maxLength={1000}
+                    showCharacterCount={true}
+                    required={true}
+                  />
+                </FormFieldGroup>
+              </FormSection>
+
+              {/* Requirements Section */}
+              <FormSection title="Services Required" description="Select all services that apply to your project.">
+                <CheckboxGroup
+                  control={form.control}
+                  name="requirements"
+                  label="Services Required"
+                  options={initialRequirements}
+                  columns={2}
+                  required={true}
+                />
+              </FormSection>
+
+              {/* Additional Options */}
+              <FormSection title="Additional Options">
+                <div className="space-y-4">
+                  <SingleCheckbox
+                    control={form.control}
+                    name="newsletter"
+                    label="Subscribe to our newsletter"
+                    description="Receive updates about our services and industry insights."
+                  />
+                  
+                  <SingleCheckbox
+                    control={form.control}
+                    name="terms"
+                    label="I agree to the terms and conditions"
+                    description="You agree to our Terms of Service and Privacy Policy."
+                    required={true}
+                  />
+                </div>
+              </FormSection>
+
+              <FormActions
+                onCancel={handleCancel}
+                isSubmitting={isSubmitting}
+                saveText="Save"
               />
-            </FormSection>
-
-            {/* Additional Options */}
-            <FormSection title="Additional Options">
-              <div className="space-y-4">
-                <SingleCheckbox
-                  control={form.control}
-                  name="newsletter"
-                  label="Subscribe to our newsletter"
-                  description="Receive updates about our services and industry insights."
-                />
-                
-                <SingleCheckbox
-                  control={form.control}
-                  name="terms"
-                  label="I agree to the terms and conditions"
-                  description="You agree to our Terms of Service and Privacy Policy."
-                  required={true}
-                />
-              </div>
-            </FormSection>
-
-            <FormActions
-              onCancel={handleCancel}
-              isSubmitting={isSubmitting}
-              saveText="Save"
-            />
-          </form>
-        </Form>
-      </FormContainer>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </DashboardLayout>
   );
 }

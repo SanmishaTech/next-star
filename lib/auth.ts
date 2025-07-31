@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 import { NextRequest } from 'next/server';
 import { 
   hasPermission, 
@@ -14,14 +14,17 @@ export interface AuthUser {
   role: string;
 }
 
-export function verifyToken(token: string): AuthUser | null {
+export async function verifyToken(token: string): Promise<AuthUser | null> {
   try {
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not configured');
     }
 
-    const decoded = jwt.verify(token, jwtSecret) as any;
+    const encoder = new TextEncoder();
+    const secretKey = encoder.encode(jwtSecret);
+
+    const { payload: decoded } = await jwtVerify(token, secretKey);
     
     return {
       userId: decoded.userId,
@@ -34,7 +37,7 @@ export function verifyToken(token: string): AuthUser | null {
   }
 }
 
-export function getAuthUser(request: NextRequest): AuthUser | null {
+export async function getAuthUser(request: NextRequest): Promise<AuthUser | null> {
   try {
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
@@ -44,7 +47,7 @@ export function getAuthUser(request: NextRequest): AuthUser | null {
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    return verifyToken(token);
+    return await verifyToken(token);
   } catch (error) {
     console.error('Auth extraction failed:', error);
     return null;

@@ -1,5 +1,4 @@
 // Form layout components
-export { FormContainer } from './form-container';
 export { FormSection } from './form-section';
 export { FormFieldGroup } from './form-field-group';
 export { FormActions } from './form-actions';
@@ -12,7 +11,6 @@ export { FormSeparator } from './form-separator';
 export * from './inputs';
 
 // Export types
-export type { FormContainerProps } from './form-container';
 export type { FormSectionProps } from './form-section';
 export type { FormFieldGroupProps } from './form-field-group';
 export type { FormActionsProps } from './form-actions';

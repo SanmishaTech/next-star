@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { jwtVerify, SignJWT } from 'jose';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,22 +35,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is active
-    if (!user.status) {
+    if (!user.status || user.status !== true) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Account is deactivated. Please contact administrator.' 
-        },
-        { status: 403 }
-      );
-    }
-
-    // Additional check: ensure status is explicitly true (not just truthy)
-    if (user.status !== true) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Account status is invalid. Please contact administrator.' 
+          error: 'Account is deactivated or invalid. Please contact administrator.' 
         },
         { status: 403 }
       );
@@ -69,32 +58,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate JWT token
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      console.error('JWT_SECRET is not configured');
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Server configuration error' 
-        },
-        { status: 500 }
-      );
-    }
-
-    const tokenPayload = {
+    // Generate JWT token using jose
+    const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const token = await new SignJWT({
       userId: user.id,
       email: user.email,
       role: user.role,
-    };
-
-    const token = jwt.sign(
-      tokenPayload,
-      jwtSecret,
-      { 
-        expiresIn: '24h'
-      }
-    );
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('24h')
+      .sign(jwtSecret);
 
     // Return success response with token and user info
     const userResponse = {
