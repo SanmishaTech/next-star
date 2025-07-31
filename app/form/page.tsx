@@ -327,7 +327,7 @@ export default function FormPage() {
                   />
                 </FormFieldGroup>
                 
-                <FormFieldGroup columns={1}>
+                <FormFieldGroup columns={2}>
                   <DatePicker
                     control={form.control}
                     name="birthDate"
