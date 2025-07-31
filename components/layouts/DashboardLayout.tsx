@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, Suspense } from 'react';
-import Navbar from '@/components/navigation/Navbar';
-import Header from '@/components/navigation/Header';
+import { Navbar, Header, Footer } from '@/components/navigation';
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
-import { Footer } from "@/components/ui/footer";
 import { Loader2 } from 'lucide-react';
 
 interface DashboardLayoutProps {
