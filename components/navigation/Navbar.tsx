@@ -173,7 +173,11 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
       <Button
         key={itemKey}
         variant={isActive ? "default" : "ghost"}
-        className="w-full justify-start h-9 px-3 transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+        className={`w-full justify-start h-9 px-3 transition-all duration-200 ${
+          isActive 
+            ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground" 
+            : "hover:bg-accent hover:text-accent-foreground"
+        }`}
         onClick={() => {
           if (item.href) {
             router.push(item.href);
