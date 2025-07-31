@@ -16,13 +16,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Form } from "@/components/ui/form";
 import { 
+  FormSection,
+  FormFieldGroup,
+  FormActions,
   TextInput,
   EmailInput,
   PasswordInput,
   TextareaInput,
   CheckboxInput,
-  SelectInput,
-  LoadingButton
+  SelectInput
 } from '@/components/custom';
 import { useToast } from "@/hooks/useToast";
 import { formatAmount, formatDate } from "@/lib/utils";
@@ -43,7 +45,9 @@ import {
   FormInput,
   MessageSquare,
   BarChart3,
-  Sparkles
+  Sparkles,
+  Shield,
+  Settings
 } from 'lucide-react';
 
 // Form validation schema for testing
@@ -303,79 +307,78 @@ export default function ElementsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FormInput className="h-4 w-4" />
-                    Reusable Form Components
+                    Comprehensive Form Components
                   </CardTitle>
-                  <CardDescription>Test form with validation using custom components</CardDescription>
+                  <CardDescription>Showcase of FormSection, FormFieldGroup, and FormActions components with validation</CardDescription>
                 </CardHeader>
                 <CardContent>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <TextInput
-                        control={form.control}
-                        name="name"
-                        label="Full Name"
-                        placeholder="Enter your full name"
-                        required
-                      />
-                      
-                      <EmailInput
-                        control={form.control}
-                        name="email"
-                        required
-                        placeholder="Enter your email"
-                      />
-                    </div>
+                    <FormSection title="Personal Information" icon={User} description="Basic personal details for your account">
+                      <FormFieldGroup columns={2}>
+                        <TextInput
+                          control={form.control}
+                          name="name"
+                          label="Full Name"
+                          placeholder="Enter your full name"
+                          required
+                        />
+                        
+                        <EmailInput
+                          control={form.control}
+                          name="email"
+                          required
+                          placeholder="Enter your email"
+                        />
+                      </FormFieldGroup>
 
-                    <PasswordInput
-                      control={form.control}
-                      name="password"
-                      label="Password"
-                      placeholder="Enter a secure password"
-                      required
+                      <FormFieldGroup columns={1}>
+                        <PasswordInput
+                          control={form.control}
+                          name="password"
+                          label="Password"
+                          placeholder="Enter a secure password"
+                          required
+                        />
+                      </FormFieldGroup>
+                    </FormSection>
+
+                    <FormSection title="Communication Preferences" icon={Settings} description="Configure how you'd like to be contacted">
+                      <FormFieldGroup columns={1}>
+                        <SelectInput
+                          control={form.control}
+                          name="category"
+                          label="Category"
+                          placeholder="Select a category"
+                          options={categoryOptions}
+                          required
+                        />
+
+                        <TextareaInput
+                          control={form.control}
+                          name="message"
+                          label="Message"
+                          placeholder="Type your message here..."
+                          rows={4}
+                          required
+                        />
+
+                        <CheckboxInput
+                          control={form.control}
+                          name="notifications"
+                          label="Send me email notifications"
+                        />
+                      </FormFieldGroup>
+                    </FormSection>
+
+                    <FormActions
+                      saveText="Submit Form"
+                      resetText="Reset"
+                      isSubmitting={isLoading}
+                      showReset={true}
+                      showCancel={false}
+                      onReset={() => form.reset()}
                     />
-
-                    <SelectInput
-                      control={form.control}
-                      name="category"
-                      label="Category"
-                      placeholder="Select a category"
-                      options={categoryOptions}
-                      required
-                    />
-
-                    <TextareaInput
-                      control={form.control}
-                      name="message"
-                      label="Message"
-                      placeholder="Type your message here..."
-                      rows={4}
-                      required
-                    />
-
-                    <CheckboxInput
-                      control={form.control}
-                      name="notifications"
-                      label="Send me email notifications"
-                    />
-
-                    <div className="flex gap-3 pt-4">
-                      <LoadingButton
-                        type="submit"
-                        loading={isLoading}
-                        className="flex-1"
-                      >
-                        Submit Form
-                      </LoadingButton>
-                      <Button 
-                        type="button" 
-                        variant="outline"
-                        onClick={() => form.reset()}
-                        className="px-8"
-                      >
-                        Reset
-                      </Button>
-                    </div>
                   </form>
                 </Form>
               </CardContent>
