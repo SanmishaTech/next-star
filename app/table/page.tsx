@@ -205,7 +205,7 @@ export default function TablePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Permission Tester - Remove in production */}
+        {/* Permission Tester for development */}
         <PermissionTester />
         
         <Card>

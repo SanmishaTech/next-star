@@ -20,6 +20,9 @@ export const PERMISSIONS = {
 
   // Settings
   SETTINGS_MANAGE: 'settings:manage',
+
+  // Admin
+  ADMIN_FULL_ACCESS: 'admin:full_access',
 } as const;
 
 // Define all available roles in the system
@@ -109,6 +112,7 @@ export const PERMISSION_NAMES = {
   [PERMISSIONS.USER_DELETE]: 'Delete Users',
   [PERMISSIONS.USER_CREATE]: 'Create Users',
   [PERMISSIONS.SETTINGS_MANAGE]: 'Manage Settings',
+  [PERMISSIONS.ADMIN_FULL_ACCESS]: 'Full Admin Access',
 } as const;
 
 // Export types for TypeScript

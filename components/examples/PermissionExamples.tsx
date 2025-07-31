@@ -154,11 +154,10 @@ export function PermissionExamples() {
                 </p>
                 <ActionButtons
                   id={1}
-                  onView={(id) => handleAction('View', id as number)}
-                  onEdit={(id) => handleAction('Edit', id as number)}
-                  onDelete={(id) => handleAction('Delete', id as number)}
+                  onView={hasPermission(PERMISSIONS.USER_VIEW) ? (id) => handleAction('View', id as number) : undefined}
+                  onEdit={hasPermission(PERMISSIONS.USER_EDIT) ? (id) => handleAction('Edit', id as number) : undefined}
+                  onDelete={hasPermission(PERMISSIONS.USER_DELETE) ? (id) => handleAction('Delete', id as number) : undefined}
                   confirmDeleteMessage="Are you sure you want to delete this item?"
-                  usePermissions={true}
                 />
               </div>
 
@@ -172,7 +171,6 @@ export function PermissionExamples() {
                   onEdit={(id) => handleAction('Edit', id as number)}
                   onDelete={(id) => handleAction('Delete', id as number)}
                   confirmDeleteMessage="Are you sure you want to delete this item?"
-                  usePermissions={false}
                 />
               </div>
 
