@@ -5,7 +5,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/auth';
-import { canAccessRoute, hasPermission } from '@/lib/config/roles';
+import { canAccessRoute, hasPermission } from '@/lib/utils/rbac';
 
 // Define protected routes and their required permissions
 const PROTECTED_ROUTES = {

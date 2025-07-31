@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { SortableHeader, ActionButtons, TablePagination, SearchInput } from "@/c
 import { formatDateTime, formatAmount, formatDate } from '@/lib/utils';
 import { toast } from "@/hooks/useToast";
 import { usePermissions } from '@/hooks/usePermissions';
-import { PERMISSIONS } from '@/lib/config/roles';
+import { PERMISSIONS } from '@/lib/config/permissions';
 import { PermissionTester } from '@/components/dev/PermissionTester';
 import {
   Plus,
@@ -75,6 +75,14 @@ const users: User[] = [
 ];
 
 export default function TablePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TablePageContent />
+    </Suspense>
+  );
+}
+
+function TablePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');

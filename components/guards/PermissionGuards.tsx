@@ -4,7 +4,8 @@
 
 import React from 'react';
 import { usePermissions, useRole, useAnyRole, useIsAdmin, useIsAuthenticated } from '@/hooks/usePermissions';
-import { type Permission, type Role } from '@/lib/config/roles';
+import { type Permission } from '@/lib/config/permissions';
+import { type Role } from '@/lib/config/roles';
 
 interface ProtectedComponentProps {
   children: React.ReactNode;

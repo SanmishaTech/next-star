@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requirePermission, getUserPermissions } from '@/lib/auth';
-import { PERMISSIONS } from '@/lib/config/roles';
+import { PERMISSIONS } from '@/lib/config/permissions';
 
 export async function GET(request: NextRequest) {
   try {
     // Verify authentication and require dashboard view permission
-    const authResult = requirePermission(request, PERMISSIONS.DASHBOARD_VIEW);
+    const authResult = await requirePermission(request, PERMISSIONS.DASHBOARD_VIEW);
     
     if ('error' in authResult) {
       return authResult.error;

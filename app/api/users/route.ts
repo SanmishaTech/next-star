@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requirePermission } from '@/lib/auth';
-import { PERMISSIONS } from '@/lib/config/roles';
+import { PERMISSIONS } from '@/lib/config/permissions';
 import bcrypt from 'bcryptjs';
 
 export async function GET(request: NextRequest) {
   try {
     // Require permission to manage users
-    const authResult = requirePermission(request, PERMISSIONS.USER_MANAGE);
+    const authResult = await requirePermission(request, PERMISSIONS.USER_MANAGE);
     
     if ('error' in authResult) {
       return authResult.error;
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Require permission to manage users
-    const authResult = requirePermission(request, PERMISSIONS.USER_MANAGE);
+    const authResult = await requirePermission(request, PERMISSIONS.USER_MANAGE);
     
     if ('error' in authResult) {
       return authResult.error;

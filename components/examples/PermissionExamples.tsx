@@ -10,7 +10,8 @@ import {
   AnyPermissionGuard 
 } from '@/components/guards/PermissionGuards';
 import { ActionButtons } from '@/components/custom';
-import { PERMISSIONS, ROLES } from '@/lib/config/roles';
+import { PERMISSIONS } from '@/lib/config/permissions';
+import { ROLES } from '@/lib/config/roles';
 import { usePermissions, useIsAuthenticated } from '@/hooks/usePermissions';
 import { Plus, Settings, Eye, Edit, Trash2 } from 'lucide-react';
 

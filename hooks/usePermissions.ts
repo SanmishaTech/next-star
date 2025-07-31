@@ -7,11 +7,10 @@ import { AuthService } from '@/lib/authService';
 import { 
   hasPermission, 
   canAccessRoute, 
-  getRolePermissions,
-  ROLES,
-  type Permission,
-  type Role 
-} from '@/lib/config/roles';
+  getRolePermissions
+} from '@/lib/utils/rbac';
+import { ROLES, type Role } from '@/lib/config/roles';
+import { type Permission } from '@/lib/config/permissions';
 
 export interface UsePermissionsResult {
   permissions: string[];

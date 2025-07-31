@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePermissions } from '@/hooks/usePermissions';
-import { PERMISSIONS } from '@/lib/config/roles';
+import { PERMISSIONS } from '@/lib/config/permissions';
 import {
   Home,
   Users,

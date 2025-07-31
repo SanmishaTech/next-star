@@ -3,10 +3,10 @@ import { NextRequest } from 'next/server';
 import { 
   hasPermission, 
   canAccessAPI, 
-  getRolePermissions,
-  type Permission,
-  type Role 
-} from '@/lib/config/roles';
+  getRolePermissions
+} from '@/lib/utils/rbac';
+import { type Permission } from '@/lib/config/permissions';
+import { type Role } from '@/lib/config/roles';
 
 export interface AuthUser {
   userId: number;
@@ -27,9 +27,9 @@ export async function verifyToken(token: string): Promise<AuthUser | null> {
     const { payload: decoded } = await jwtVerify(token, secretKey);
     
     return {
-      userId: decoded.userId,
-      email: decoded.email,
-      role: decoded.role,
+      userId: decoded.userId as number,
+      email: decoded.email as string,
+      role: decoded.role as string,
     };
   } catch (error) {
     console.error('Token verification failed:', error);
@@ -54,8 +54,8 @@ export async function getAuthUser(request: NextRequest): Promise<AuthUser | null
   }
 }
 
-export function requireAuth(request: NextRequest): { user: AuthUser } | { error: Response } {
-  const user = getAuthUser(request);
+export async function requireAuth(request: NextRequest): Promise<{ user: AuthUser } | { error: Response }> {
+  const user = await getAuthUser(request);
   
   if (!user) {
     return {
@@ -75,8 +75,8 @@ export function requireAuth(request: NextRequest): { user: AuthUser } | { error:
   return { user };
 }
 
-export function requireRole(request: NextRequest, allowedRoles: string[]): { user: AuthUser } | { error: Response } {
-  const authResult = requireAuth(request);
+export async function requireRole(request: NextRequest, allowedRoles: string[]): Promise<{ user: AuthUser } | { error: Response }> {
+  const authResult = await requireAuth(request);
   
   if ('error' in authResult) {
     return authResult;
@@ -103,8 +103,8 @@ export function requireRole(request: NextRequest, allowedRoles: string[]): { use
 }
 
 // New permission-based auth functions
-export function requirePermission(request: NextRequest, permission: Permission): { user: AuthUser } | { error: Response } {
-  const authResult = requireAuth(request);
+export async function requirePermission(request: NextRequest, permission: Permission): Promise<{ user: AuthUser } | { error: Response }> {
+  const authResult = await requireAuth(request);
   
   if ('error' in authResult) {
     return authResult;
@@ -130,8 +130,8 @@ export function requirePermission(request: NextRequest, permission: Permission):
   return { user };
 }
 
-export function requireAnyPermission(request: NextRequest, permissions: Permission[]): { user: AuthUser } | { error: Response } {
-  const authResult = requireAuth(request);
+export async function requireAnyPermission(request: NextRequest, permissions: Permission[]): Promise<{ user: AuthUser } | { error: Response }> {
+  const authResult = await requireAuth(request);
   
   if ('error' in authResult) {
     return authResult;
@@ -159,8 +159,8 @@ export function requireAnyPermission(request: NextRequest, permissions: Permissi
   return { user };
 }
 
-export function requireAllPermissions(request: NextRequest, permissions: Permission[]): { user: AuthUser } | { error: Response } {
-  const authResult = requireAuth(request);
+export async function requireAllPermissions(request: NextRequest, permissions: Permission[]): Promise<{ user: AuthUser } | { error: Response }> {
+  const authResult = await requireAuth(request);
   
   if ('error' in authResult) {
     return authResult;
@@ -189,8 +189,8 @@ export function requireAllPermissions(request: NextRequest, permissions: Permiss
 }
 
 // API-specific permission check
-export function requireAPIAccess(request: NextRequest, method: string, endpoint: string): { user: AuthUser } | { error: Response } {
-  const authResult = requireAuth(request);
+export async function requireAPIAccess(request: NextRequest, method: string, endpoint: string): Promise<{ user: AuthUser } | { error: Response }> {
+  const authResult = await requireAuth(request);
   
   if ('error' in authResult) {
     return authResult;
