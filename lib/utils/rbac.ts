@@ -6,26 +6,14 @@
 
 import { PERMISSIONS, PERMISSION_NAMES, type Permission } from '../config/permissions';
 import { ROLES, ROLE_NAMES, ROLE_PERMISSIONS, type Role } from '../config/roles';
+import { ROUTE_PERMISSIONS } from '../config/routes';
+import { API_PERMISSIONS } from '../config/api';
 
-// Route-based access control
-export const ROUTE_PERMISSIONS = {
-  '/dashboard': [PERMISSIONS.DASHBOARD_VIEW],
-  '/dashboard/admin': [PERMISSIONS.DASHBOARD_ADMIN],
-  '/users': [PERMISSIONS.USER_MANAGE],
-  '/settings': [PERMISSIONS.SETTINGS_MANAGE],
-  '/admin': [PERMISSIONS.DASHBOARD_ADMIN],
-} as const;
-
-// API endpoint permissions
-export const API_PERMISSIONS = {
-  'GET /api/auth/me': [PERMISSIONS.DASHBOARD_VIEW],
-  'GET /api/users': [PERMISSIONS.USER_MANAGE],
-  'POST /api/users': [PERMISSIONS.USER_MANAGE],
-  'PUT /api/users/[id]': [PERMISSIONS.USER_MANAGE],
-  'DELETE /api/users/[id]': [PERMISSIONS.USER_MANAGE],
-  'GET /api/settings': [PERMISSIONS.SETTINGS_MANAGE],
-  'PUT /api/settings': [PERMISSIONS.SETTINGS_MANAGE],
-} as const;
+// Re-export constants for convenience
+export { PERMISSIONS, PERMISSION_NAMES } from '../config/permissions';
+export { ROLES, ROLE_NAMES, ROLE_PERMISSIONS } from '../config/roles';
+export { ROUTE_PERMISSIONS } from '../config/routes';
+export { API_PERMISSIONS } from '../config/api';
 
 /**
  * Get all permissions for a role

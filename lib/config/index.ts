@@ -22,18 +22,14 @@ export {
   type RoleName,
 } from './roles';
 
-// Export helper functions and route/API permissions
+// Export route and API permissions from their config files
+export { ROUTE_PERMISSIONS } from './routes';
+export { API_PERMISSIONS } from './api';
+
+// Export helper functions
 export {
-  ROUTE_PERMISSIONS,
-  API_PERMISSIONS,
   getRolePermissions,
   hasPermission,
   canAccessRoute,
   canAccessAPI,
-  getAllRoles,
-  getAllPermissions,
-  getPermissionsByCategory,
-  formatPermission,
-  formatRole,
-  getPermissionCategory,
 } from '../utils/rbac';
