@@ -209,7 +209,7 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
   return (
     <div className={`fixed inset-y-0 left-0 z-50 ${sidebarWidth} bg-card border-r transform ${
       sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-    } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col h-screen`}>
+    } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col min-h-screen`}>
       
       {/* Logo */}
       <div className={`flex items-center justify-between ${headerHeight} ${padding} border-b flex-shrink-0`}>

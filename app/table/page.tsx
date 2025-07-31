@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,7 +71,7 @@ const users: User[] = [
   { id: 37, name: 'Timothy Collins', email: 'timothy@example.com', role: 'Developer', status: 'Active', joined: '2024-04-22', lastLogin: '2024-07-23 11:40:00', amount: 78500.00 },
 ];
 
-function TableContent() {
+export default function TablePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
@@ -311,23 +311,5 @@ function TableContent() {
           </CardContent>
         </Card>
     </DashboardLayout>
-  );
-}
-
-export default function TablePage() {
-  return (
-    <Suspense fallback={
-      <DashboardLayout>
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex items-center justify-center">
-              <div className="text-muted-foreground">Loading...</div>
-            </div>
-          </CardContent>
-        </Card>
-      </DashboardLayout>
-    }>
-      <TableContent />
-    </Suspense>
   );
 }

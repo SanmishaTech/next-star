@@ -251,7 +251,7 @@ export default function FormPage() {
   };
 
   return (
-    <DashboardLayout>
+    <DashboardLayout loadingMessage="Loading form...">
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">

@@ -1,15 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Navbar from '@/components/navigation/Navbar';
 import Header from '@/components/navigation/Header';
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Card, CardContent } from "@/components/ui/card";
+import { Footer } from "@/components/ui/footer";
+import { Loader2 } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  loadingMessage?: string;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+function DashboardLoadingFallback({ loadingMessage = "Loading..." }: { loadingMessage: string }) {
+  return (
+    <Card>
+      <CardContent className="p-8">
+        <div className="flex items-center justify-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <div className="text-muted-foreground">{loadingMessage}</div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function DashboardLayout({ children, loadingMessage = "Loading..." }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +37,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background">
       {/* Navbar/Sidebar */}
       <Navbar
         sidebarCollapsed={sidebarCollapsed}
@@ -29,7 +46,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
         <Header
           sidebarCollapsed={sidebarCollapsed}
@@ -41,13 +58,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1">
           <TooltipProvider>
-            <div className="p-6 space-y-6 min-h-full">
-              {children}
+            <div className="p-6 space-y-6">
+              <Suspense fallback={<DashboardLoadingFallback loadingMessage={loadingMessage} />}>
+                {children}
+              </Suspense>
             </div>
           </TooltipProvider>
         </main>
+
+        {/* Footer */}
+        <Footer />
       </div>
 
       {/* Sidebar Overlay for Mobile */}
