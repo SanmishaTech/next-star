@@ -13,6 +13,10 @@ export const PERMISSIONS = {
 
   // Users
   USER_MANAGE: 'user:manage',
+  USER_VIEW: 'user:view',
+  USER_EDIT: 'user:edit',
+  USER_DELETE: 'user:delete',
+  USER_CREATE: 'user:create',
 
   // Settings
   SETTINGS_MANAGE: 'settings:manage',
@@ -33,6 +37,8 @@ export const ROLE_PERMISSIONS = {
 
   [ROLES.USER]: [
     PERMISSIONS.DASHBOARD_VIEW,
+    PERMISSIONS.USER_VIEW,
+    PERMISSIONS.USER_EDIT
   ],
 } as const;
 
@@ -98,6 +104,10 @@ export const PERMISSION_NAMES = {
   [PERMISSIONS.DASHBOARD_VIEW]: 'View Dashboard',
   [PERMISSIONS.DASHBOARD_ADMIN]: 'Admin Dashboard',
   [PERMISSIONS.USER_MANAGE]: 'Manage Users',
+  [PERMISSIONS.USER_VIEW]: 'View Users',
+  [PERMISSIONS.USER_EDIT]: 'Edit Users',
+  [PERMISSIONS.USER_DELETE]: 'Delete Users',
+  [PERMISSIONS.USER_CREATE]: 'Create Users',
   [PERMISSIONS.SETTINGS_MANAGE]: 'Manage Settings',
 } as const;
 

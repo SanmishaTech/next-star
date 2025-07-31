@@ -7,9 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
-import { SortableHeader, ViewButton, EditButton, DeleteButton, ButtonGroup, TablePagination, SearchInput } from "@/components/custom";
+import { SortableHeader, ActionButtons, TablePagination, SearchInput } from "@/components/custom";
 import { formatDateTime, formatAmount, formatDate } from '@/lib/utils';
 import { toast } from "@/hooks/useToast";
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSIONS } from '@/lib/config/roles';
+import { PermissionTester } from '@/components/dev/PermissionTester';
 import {
   Plus,
   Download,
@@ -79,6 +82,9 @@ export default function TablePage() {
   const [sortField, setSortField] = useState<keyof User | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const itemsPerPage = 10;
+
+  // Permission checking
+  const { hasPermission } = usePermissions();
 
   // Check if user was redirected after successful form save
   useEffect(() => {
@@ -198,7 +204,11 @@ export default function TablePage() {
 
   return (
     <DashboardLayout>
-      <Card>
+      <div className="space-y-6">
+        {/* Permission Tester - Remove in production */}
+        <PermissionTester />
+        
+        <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl font-bold">Users</CardTitle>
@@ -211,10 +221,12 @@ export default function TablePage() {
                   <Download className="h-4 w-4" />
                   Export
                 </Button>
-                <Button onClick={handleCreateNew} className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add
-                </Button>
+                {hasPermission(PERMISSIONS.USER_CREATE) && (
+                  <Button onClick={handleCreateNew} className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add
+                  </Button>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -277,21 +289,13 @@ export default function TablePage() {
                           {formatAmount(user.amount)}
                         </TableCell>
                         <TableCell>
-                          <ButtonGroup>
-                            <ViewButton
-                              id={user.id}
-                              onView={handleView}
-                            />
-                            <EditButton
-                              id={user.id}
-                              onEdit={handleEdit}
-                            />
-                            <DeleteButton
-                              id={user.id}
-                              onDelete={handleDelete}
-                              confirmMessage="Are you sure you want to delete this user?"
-                            />
-                          </ButtonGroup>
+                          <ActionButtons
+                            id={user.id}
+                            onView={hasPermission(PERMISSIONS.USER_VIEW) ? handleView : undefined}
+                            onEdit={hasPermission(PERMISSIONS.USER_EDIT) ? handleEdit : undefined}
+                            onDelete={hasPermission(PERMISSIONS.USER_DELETE) ? handleDelete : undefined}
+                            confirmDeleteMessage="Are you sure you want to delete this user?"
+                          />
                         </TableCell>
                       </TableRow>
                     );
@@ -310,6 +314,7 @@ export default function TablePage() {
             />
           </CardContent>
         </Card>
+      </div>
     </DashboardLayout>
   );
 }

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSIONS } from '@/lib/config/roles';
 import {
   Home,
   Users,
@@ -27,7 +29,7 @@ interface NavItem {
   icon: React.ReactNode;
   label: string;
   href: string;
-  enabled?: boolean;
+  permission?: string; // Permission required to access this nav item
   badge?: string;
 }
 
@@ -46,13 +48,14 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set([0, 1, 2])); // All groups expanded by default
   const router = useRouter();
   const pathname = usePathname();
+  const { hasPermission } = usePermissions();
 
   // Dashboard item - standalone outside groups
   const dashboardItem: NavItem = {
     icon: <Home className="h-4 w-4" />,
     label: 'Dashboard',
     href: '/dashboard',
-    enabled: true,
+    // No permission required for dashboard - accessible to all users
   };
 
   const menuGroups: NavGroup[] = [
@@ -63,21 +66,21 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
           icon: <Users className="h-4 w-4" />,
           label: 'All Customers',
           href: '/customers',
-          enabled: true,
+          permission: PERMISSIONS.USER_VIEW, // Requires user view permission
         },
         {
           icon: <MessageSquare className="h-4 w-4" />,
           label: 'Communications',
           href: '/communications',
-          enabled: true,
+          permission: PERMISSIONS.USER_VIEW, // Requires user view permission
         },
         {
           icon: <Calendar className="h-4 w-4" />,
           label: 'Appointments',
           href: '/appointments',
-          enabled: true,
+          permission: PERMISSIONS.USER_VIEW, // Requires user view permission
         },
-      ].filter(item => item.enabled)
+      ].filter(item => !item.permission || hasPermission(item.permission))
     },
     {
       title: "UI",
@@ -86,21 +89,21 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
           icon: <Table className="h-4 w-4" />,
           label: 'Table',
           href: '/table',
-          enabled: true,
+          permission: PERMISSIONS.USER_VIEW, // Requires user view permission
         },
         {
           icon: <FormInput className="h-4 w-4" />,
           label: 'Form',
           href: '/form',
-          enabled: true,
+          permission: PERMISSIONS.USER_CREATE, // Requires user create permission
         },
         {
           icon: <Building className="h-4 w-4" />,
           label: 'Elements',
           href: '/elements',
-          enabled: true,
+          // No permission required - accessible to all users
         },        
-      ].filter(item => item.enabled)
+      ].filter(item => !item.permission || hasPermission(item.permission))
     },
     {
       title: "Finance",
@@ -109,21 +112,21 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
           icon: <DollarSign className="h-4 w-4" />,
           label: 'Accounting',
           href: '/finance/accounts',
-          enabled: true,
+          permission: PERMISSIONS.ADMIN_FULL_ACCESS, // Requires admin access
         },
         {
           icon: <CreditCard className="h-4 w-4" />,
           label: 'Payments',
           href: '/finance/payments',
-          enabled: true,
+          permission: PERMISSIONS.ADMIN_FULL_ACCESS, // Requires admin access
         },
         {
           icon: <FileText className="h-4 w-4" />,
           label: 'Tax Management',
           href: '/finance/tax',
-          enabled: true,
+          permission: PERMISSIONS.ADMIN_FULL_ACCESS, // Requires admin access
         },
-      ].filter(item => item.enabled)
+      ].filter(item => !item.permission || hasPermission(item.permission))
     },
     {
       title: "Settings",
@@ -132,21 +135,21 @@ export default function Navbar({ sidebarCollapsed, sidebarOpen, setSidebarOpen }
           icon: <Settings className="h-4 w-4" />,
           label: 'General',
           href: '/settings',
-          enabled: true,
+          permission: PERMISSIONS.USER_VIEW, // Basic settings for all users
         },
         {
           icon: <Shield className="h-4 w-4" />,
           label: 'Security',
           href: '/settings/security',
-          enabled: true,
+          permission: PERMISSIONS.ADMIN_FULL_ACCESS, // Security settings for admins only
         },
         {
           icon: <HelpCircle className="h-4 w-4" />,
           label: 'Support',
           href: '/support',
-          enabled: true,
+          // No permission required - support accessible to all users
         },
-      ].filter(item => item.enabled)
+      ].filter(item => !item.permission || hasPermission(item.permission))
     },
   ].filter(group => group.items.length > 0);
 

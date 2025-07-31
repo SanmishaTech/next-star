@@ -192,14 +192,43 @@ export default function FormPage() {
   const formState = form.formState;
   const isFormValid = formState.isValid && Object.keys(formState.errors).length === 0;
 
+  // Handle form submission errors
+  const onSubmitError = (errors: any) => {
+    const errorMessages: string[] = [];
+    
+    // Extract error messages from React Hook Form
+    Object.values(errors).forEach((error: any) => {
+      if (error?.message) {
+        errorMessages.push(error.message);
+      }
+    });
+    
+    setValidationErrors(errorMessages);
+    const errorCount = errorMessages.length;
+    toast({
+      title: `${errorCount} Validation Error${errorCount !== 1 ? 's' : ''} Found`,
+      description: `Please fix the ${errorCount} error${errorCount !== 1 ? 's' : ''} below before submitting.`,
+      variant: "destructive",
+    });
+  };
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setValidationErrors([]);
     
     try {
-      // Additional client-side validation
+      // Collect all validation errors (React Hook Form + custom)
       const errors: string[] = [];
       
+      // Get React Hook Form errors
+      const formErrors = form.formState.errors;
+      Object.values(formErrors).forEach((error) => {
+        if (error?.message) {
+          errors.push(error.message);
+        }
+      });
+      
+      // Additional client-side validation
       if (!data.terms) {
         errors.push("You must accept the terms and conditions");
       }
@@ -211,9 +240,10 @@ export default function FormPage() {
       if (errors.length > 0) {
         setValidationErrors(errors);
         setIsSubmitting(false);
+        const errorCount = errors.length;
         toast({
-          title: "Validation Error",
-          description: "Please fix the errors below before submitting.",
+          title: `${errorCount} Validation Error${errorCount !== 1 ? 's' : ''} Found`,
+          description: `Please fix the ${errorCount} error${errorCount !== 1 ? 's' : ''} below before submitting.`,
           variant: "destructive",
         });
         return;
@@ -260,12 +290,8 @@ export default function FormPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {validationErrors.length > 0 && (
-            <ValidationSummary errors={validationErrors} />
-          )}
-          
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit, onSubmitError)} className="space-y-6">
               
               {/* Personal Information Section */}
               <FormSection title="Personal Information" icon={User}>
